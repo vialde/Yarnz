@@ -9,6 +9,7 @@ type the following commandz
 
 
 source na/bin/activate
+
 python narrative-chaos-login-python.py
 
 
