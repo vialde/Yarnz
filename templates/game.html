@@ -1,0 +1,652 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Narrative Chaos - {{ game.title }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            background-color: #1a1a2e;
+            color: #ffffff;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .game-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 1rem;
+        }
+        .header {
+            background-color: #16213e;
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+        }
+        .navbar-brand {
+            color: #7b2cbf;
+            font-weight: bold;
+        }
+        .welcome-message {
+            color: #9d4edd;
+        }
+        .main-content {
+            display: flex;
+            flex: 1;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        .story-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .sidebar {
+            width: 300px;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .card {
+            background-color: #16213e;
+            border: none;
+            border-radius: 10px;
+        }
+        .card-header {
+            background-color: #0f3460;
+            color: #9d4edd;
+            font-weight: bold;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+        }
+        .story-display {
+            flex: 1;
+            padding: 1rem;
+            background-color: #16213e;
+            border-radius: 10px;
+            overflow-y: auto;
+            min-height: 300px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+        }
+        .fantasy-theme {
+            background-color: #182848;
+            background-image: linear-gradient(135deg, #182848 0%, #4b6cb7 100%);
+        }
+        .scifi-theme {
+            background-color: #000428;
+            background-image: linear-gradient(135deg, #000428 0%, #004e92 100%);
+        }
+        .mystery-theme {
+            background-color: #200122;
+            background-image: linear-gradient(135deg, #200122 0%, #6f0000 100%);
+        }
+        .horror-theme {
+            background-color: #16222A;
+            background-image: linear-gradient(135deg, #16222A 0%, #3A6073 100%);
+        }
+        .editor-container {
+            position: relative;
+            min-height: 150px;
+        }
+        .story-editor {
+            width: 100%;
+            min-height: 150px;
+            padding: 1rem;
+            background-color: #0f3460;
+            color: white;
+            border: 1px solid #1f4287;
+            border-radius: 10px;
+            resize: vertical;
+            font-family: inherit;
+            line-height: 1.6;
+        }
+        .story-editor:focus {
+            outline: none;
+            border-color: #7b2cbf;
+            box-shadow: 0 0 0 0.25rem rgba(123, 44, 191, 0.25);
+        }
+        .editor-controls {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 0.5rem;
+        }
+        .editor-status {
+            font-size: 0.9rem;
+            color: #9d4edd;
+        }
+        .btn-purple {
+            background-color: #7b2cbf;
+            border-color: #7b2cbf;
+            color: white;
+        }
+        .btn-purple:hover {
+            background-color: #9d4edd;
+            border-color: #9d4edd;
+            color: white;
+        }
+        .btn-outline-purple {
+            color: #7b2cbf;
+            border-color: #7b2cbf;
+        }
+        .btn-outline-purple:hover {
+            background-color: #7b2cbf;
+            color: white;
+        }
+        .typing-indicator {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            color: #9d4edd;
+            font-style: italic;
+            font-size: 0.9rem;
+            display: none;
+        }
+        .player-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .player-item {
+            display: flex;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #1f4287;
+        }
+        .player-item:last-child {
+            border-bottom: none;
+        }
+        .player-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 0.75rem;
+            background-color: #0f3460;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #9d4edd;
+            font-size: 1.2rem;
+        }
+        .player-info {
+            flex: 1;
+        }
+        .player-name {
+            font-weight: bold;
+            color: white;
+            margin: 0;
+        }
+        .player-status {
+            font-size: 0.8rem;
+            color: #9d4edd;
+            margin: 0;
+        }
+        .host-badge {
+            background-color: #7b2cbf;
+            color: white;
+            font-size: 0.7rem;
+            padding: 0.1rem 0.4rem;
+            border-radius: 10px;
+            margin-left: 0.5rem;
+        }
+        .current-user {
+            color: #7b2cbf;
+        }
+        .chat-messages {
+            height: 250px;
+            overflow-y: auto;
+            padding: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .chat-message {
+            margin-bottom: 0.75rem;
+        }
+        .chat-sender {
+            font-weight: bold;
+        }
+        .chat-timestamp {
+            font-size: 0.7rem;
+            color: #9d4edd;
+            margin-left: 0.5rem;
+        }
+        .chat-input {
+            display: flex;
+            gap: 0.5rem;
+        }
+        .chat-input input {
+            flex: 1;
+            background-color: #0f3460;
+            border: 1px solid #1f4287;
+            color: white;
+            padding: 0.5rem;
+            border-radius: 5px;
+        }
+        .chat-input input:focus {
+            outline: none;
+            border-color: #7b2cbf;
+        }
+        .tooltip-icon {
+            color: #9d4edd;
+            cursor: pointer;
+        }
+        /* Collaborative editing indicators */
+        .editor-cursor {
+            position: absolute;
+            width: 2px;
+            height: 20px;
+            background-color: #ff0000;
+            animation: blink 1s infinite;
+        }
+        .editor-cursor::after {
+            content: attr(data-user);
+            position: absolute;
+            top: -18px;
+            left: 0;
+            white-space: nowrap;
+            font-size: 10px;
+            background-color: #ff0000;
+            color: white;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+        .cursor-elven {
+            background-color: #00ff00;
+        }
+        .cursor-elven::after {
+            background-color: #00ff00;
+            color: black;
+        }
+        .cursor-wizard {
+            background-color: #0000ff;
+        }
+        .cursor-wizard::after {
+            background-color: #0000ff;
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="header d-flex justify-content-between align-items-center">
+            <div>
+                <span class="navbar-brand">Narrative Chaos</span>
+                <span class="ms-3 text-light">{{ game.title }}</span>
+            </div>
+            <div>
+                <span class="welcome-message me-3">{{ username }}</span>
+                <a href="{{ url_for('dashboard') }}" class="btn btn-outline-light btn-sm me-2">Dashboard</a>
+                <a href="{{ url_for('logout') }}" class="btn btn-outline-light btn-sm">Logout</a>
+            </div>
+        </div>
+        
+        {% if not user_has_joined %}
+        <div class="join-game-banner mb-3 p-4 text-center rounded" style="background-color: #0f3460;">
+            <h4>You haven't joined this game yet</h4>
+            <p>Join this game to participate in the collaborative storytelling experience.</p>
+            <button id="join-game-btn" class="btn btn-purple btn-lg" data-game-id="{{ game.id }}">Join Game</button>
+        </div>
+        {% endif %}
+        
+        <div class="main-content">
+            <div class="story-area">
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>Story</div>
+                            <div>
+                                <span class="badge bg-purple me-2">{{ game.difficulty }}</span>
+                                <span class="badge bg-info">{{ game.players|length }}/{{ game.max_players }} Players</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="story-display {{ game.theme }}-theme" id="story-display">{{ game.current_content }}</div>
+                    </div>
+                </div>
+                
+                <div class="editor-container">
+                    <textarea class="story-editor" id="story-editor" placeholder="Continue the story..."></textarea>
+                    <div class="typing-indicator" id="typing-indicator">Someone is typing...</div>
+                    
+                    <!-- Simulated collaborative editing cursors -->
+                    <div class="editor-cursor" id="cursor-elven" data-user="ElvenRanger" style="display: none; top: 40px; left: 120px;"></div>
+                    <div class="editor-cursor cursor-elven" id="cursor-wizard" data-user="WizardOfTheCoast" style="display: none; top: 60px; left: 80px;"></div>
+                    
+                    <div class="editor-controls">
+                        <div class="editor-status">
+                            <i class="fas fa-info-circle tooltip-icon me-1" title="Your additions will be appended to the story"></i>
+                            <span id="character-count">0 characters</span>
+                        </div>
+                        <div>
+                            <button class="btn btn-outline-secondary me-2" id="discard-btn">Discard</button>
+                            <button class="btn btn-purple" id="submit-btn">Add to Story</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="sidebar">
+                <div class="card">
+                    <div class="card-header">Players ({{ players|length }})</div>
+                    <div class="card-body p-0">
+                        <div class="player-list">
+                            {% for player in players %}
+                            <div class="player-item">
+                                {% if player.avatar %}
+                                <img src="{{ player.avatar }}" alt="{{ player.username }}" class="player-avatar">
+                                {% else %}
+                                <div class="player-avatar">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                {% endif %}
+                                <div class="player-info">
+                                    <p class="player-name {% if player.username == username %}current-user{% endif %}">
+                                        {{ player.username }}
+                                        {% if player.status == 'host' %}
+                                        <span class="host-badge">Host</span>
+                                        {% endif %}
+                                    </p>
+                                    <p class="player-status">{{ player.last_active }}</p>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card flex-grow-1 d-flex flex-column">
+                    <div class="card-header">Chat</div>
+                    <div class="card-body p-2 d-flex flex-column flex-grow-1">
+                        <div class="chat-messages" id="chat-messages">
+                            {% for message in chat_messages %}
+                            <div class="chat-message">
+                                <span class="chat-sender {% if message.username == username %}current-user{% endif %}">{{ message.username }}:</span>
+                                <span class="chat-text">{{ message.message }}</span>
+                                <span class="chat-timestamp">{{ message.timestamp }}</span>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <div class="chat-input">
+                            <input type="text" id="chat-input" placeholder="Type a message...">
+                            <button class="btn btn-purple" id="send-chat-btn">Send</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">Game Info</div>
+                    <div class="card-body">
+                        <p><strong>Host:</strong> {{ game.host }}</p>
+                        <p><strong>Started:</strong> {{ game.started_date }}</p>
+                        <p class="mb-0">{{ game.description }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Join game functionality
+            const joinGameBtn = document.getElementById('join-game-btn');
+            if (joinGameBtn) {
+                joinGameBtn.addEventListener('click', function() {
+                    const gameId = this.getAttribute('data-game-id');
+                    joinGame(gameId);
+                });
+            }
+            
+            // Story editor functionality
+            const storyEditor = document.getElementById('story-editor');
+            const storyDisplay = document.getElementById('story-display');
+            const characterCount = document.getElementById('character-count');
+            const typingIndicator = document.getElementById('typing-indicator');
+            const submitBtn = document.getElementById('submit-btn');
+            const discardBtn = document.getElementById('discard-btn');
+            
+            // Chat functionality
+            const chatInput = document.getElementById('chat-input');
+            const sendChatBtn = document.getElementById('send-chat-btn');
+            const chatMessages = document.getElementById('chat-messages');
+            
+            // Collaborative cursors
+            const cursorElven = document.getElementById('cursor-elven');
+            const cursorWizard = document.getElementById('cursor-wizard');
+            
+            // Join game function
+            function joinGame(gameId) {
+                fetch(`/join-game/${gameId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Show success message and reload the page
+                        alert(data.message);
+                        window.location.reload();
+                    } else {
+                        // Show error message
+                        alert(data.message || 'An error occurred');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while joining the game');
+                });
+            }
+            
+            // Disable the editor if user hasn't joined
+            {% if not user_has_joined %}
+            if (storyEditor) {
+                storyEditor.disabled = true;
+                storyEditor.placeholder = "Join the game to contribute to the story...";
+                
+                if (submitBtn) submitBtn.disabled = true;
+                if (discardBtn) discardBtn.disabled = true;
+                
+                const chatInput = document.getElementById('chat-input');
+                const sendChatBtn = document.getElementById('send-chat-btn');
+                if (chatInput) chatInput.disabled = true;
+                if (sendChatBtn) sendChatBtn.disabled = true;
+            }
+            {% endif %}
+            
+            // Update character count
+            if (storyEditor) {
+                storyEditor.addEventListener('input', function() {
+                    const count = storyEditor.value.length;
+                    characterCount.textContent = `${count} character${count !== 1 ? 's' : ''}`;
+                    
+                    // Show typing indicator to other users (simulated)
+                    if (count > 0) {
+                        // In a real app, you would broadcast this to other users
+                        simulateOtherUserTyping();
+                    }
+                });
+            }
+            
+            // Submit story addition
+            submitBtn.addEventListener('click', function() {
+                if (storyEditor.value.trim() === '') return;
+                
+                // Add the new content to the story display
+                storyDisplay.textContent += '\n\n' + storyEditor.value;
+                
+                // Scroll to the bottom of the story
+                storyDisplay.scrollTop = storyDisplay.scrollHeight;
+                
+                // Clear the editor
+                storyEditor.value = '';
+                characterCount.textContent = '0 characters';
+                
+                // In a real app, you would send this to the server and broadcast to other users
+                alert('In a real application, your addition would be saved to the database and broadcast to all users in real-time.');
+                
+                // Simulate other users continuing the story after a delay
+                setTimeout(simulateOtherUserContribution, 5000);
+            });
+            
+            // Discard button
+            discardBtn.addEventListener('click', function() {
+                storyEditor.value = '';
+                characterCount.textContent = '0 characters';
+            });
+            
+            // Chat functionality
+            sendChatBtn.addEventListener('click', sendChatMessage);
+            chatInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendChatMessage();
+                }
+            });
+            
+            function sendChatMessage() {
+                if (chatInput.value.trim() === '') return;
+                
+                // Create new chat message
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'chat-message';
+                messageDiv.innerHTML = `
+                    <span class="chat-sender current-user">${'{{ username }}'}:</span>
+                    <span class="chat-text">${chatInput.value}</span>
+                    <span class="chat-timestamp">Just now</span>
+                `;
+                
+                // Add to chat and scroll to bottom
+                chatMessages.appendChild(messageDiv);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+                
+                // Clear input
+                chatInput.value = '';
+                
+                // Simulate response from another user
+                setTimeout(simulateOtherUserChat, 3000);
+            }
+            
+            // Simulate collaborative editing
+            storyEditor.addEventListener('click', function(e) {
+                // Calculate cursor position relative to the textarea
+                const rect = storyEditor.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                // In a real-time collaborative editor, you would broadcast your cursor position
+                // For simulation, we'll show other users' cursors randomly
+                simulateOtherUsersCursors();
+            });
+            
+            // Show tooltips on hover
+            document.querySelectorAll('[title]').forEach(el => {
+                new bootstrap.Tooltip(el);
+            });
+            
+            // Simulation functions for demonstration purposes
+            function simulateOtherUserTyping() {
+                // Randomly show/hide the typing indicator
+                if (Math.random() > 0.7) {
+                    typingIndicator.style.display = 'block';
+                    
+                    // Hide after a random time
+                    setTimeout(() => {
+                        typingIndicator.style.display = 'none';
+                    }, 2000 + Math.random() * 3000);
+                }
+            }
+            
+            function simulateOtherUsersCursors() {
+                // Randomly show other users' cursors
+                if (Math.random() > 0.5) {
+                    cursorElven.style.display = 'block';
+                    cursorElven.style.top = (30 + Math.random() * 100) + 'px';
+                    cursorElven.style.left = (Math.random() * 300) + 'px';
+                    
+                    setTimeout(() => {
+                        cursorElven.style.display = 'none';
+                    }, 3000 + Math.random() * 2000);
+                }
+                
+                if (Math.random() > 0.5) {
+                    cursorWizard.style.display = 'block';
+                    cursorWizard.style.top = (30 + Math.random() * 100) + 'px';
+                    cursorWizard.style.left = (50 + Math.random() * 300) + 'px';
+                    
+                    setTimeout(() => {
+                        cursorWizard.style.display = 'none';
+                    }, 3000 + Math.random() * 2000);
+                }
+            }
+            
+            function simulateOtherUserChat() {
+                // Only respond sometimes
+                if (Math.random() < 0.7) return;
+                
+                const responses = [
+                    "I like where this story is going!",
+                    "What if we introduced a new character here?",
+                    "Maybe we should add a plot twist?",
+                    "Great addition to the narrative!",
+                    "I'm thinking of adding a mysterious artifact next."
+                ];
+                
+                const users = ["ElvenRanger", "WizardOfTheCoast", "DungeonMaster42"];
+                const randomUser = users[Math.floor(Math.random() * users.length)];
+                const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+                
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'chat-message';
+                messageDiv.innerHTML = `
+                    <span class="chat-sender">${randomUser}:</span>
+                    <span class="chat-text">${randomResponse}</span>
+                    <span class="chat-timestamp">Just now</span>
+                `;
+                
+                chatMessages.appendChild(messageDiv);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+            
+            function simulateOtherUserContribution() {
+                // Only contribute sometimes
+                if (Math.random() < 0.5) return;
+                
+                const contributions = [
+                    "The howl was suddenly cut short, replaced by a sound even more unsettling—silence. The party exchanged nervous glances, each member gripping their weapons tighter.",
+                    ""We should turn back," whispered Elara, her voice quavering. But even as she spoke, the massive doors of the castle began to creak open, seemingly of their own accord.",
+                    "Garrick reached into his pouch and extracted a small, glowing crystal. "This will guide us to the artifact," he explained, watching as the crystal pulsed with an eerie blue light that intensified when pointed towards the castle's tallest tower."
+                ];
+                
+                const randomContribution = contributions[Math.floor(Math.random() * contributions.length)];
+                const users = ["ElvenRanger", "WizardOfTheCoast", "DungeonMaster42"];
+                const randomUser = users[Math.floor(Math.random() * users.length)];
+                
+                // Add the contribution to the story
+                storyDisplay.textContent += '\n\n' + randomContribution;
+                storyDisplay.scrollTop = storyDisplay.scrollHeight;
+                
+                // Add a chat message about it
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'chat-message';
+                messageDiv.innerHTML = `
+                    <span class="chat-sender">${randomUser}:</span>
+                    <span class="chat-text">I've added to the story!</span>
+                    <span class="chat-timestamp">Just now</span>
+                `;
+                
+                chatMessages.appendChild(messageDiv);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+        });
+    </script>
+</body>
+</html>

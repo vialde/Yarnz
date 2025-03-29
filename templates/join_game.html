@@ -1,0 +1,199 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Narrative Chaos - Join Game</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #1a1a2e;
+            color: #ffffff;
+        }
+        .dashboard-container {
+            padding: 2rem;
+        }
+        .header {
+            background-color: #16213e;
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+        }
+        .navbar-brand {
+            color: #7b2cbf;
+            font-weight: bold;
+        }
+        .welcome-message {
+            color: #9d4edd;
+        }
+        .btn-outline-light:hover {
+            background-color: #7b2cbf;
+            border-color: #7b2cbf;
+        }
+        .card {
+            background-color: #16213e;
+            border: none;
+            margin-bottom: 20px;
+        }
+        .card-header {
+            background-color: #0f3460;
+            color: #9d4edd;
+            font-weight: bold;
+        }
+        .game-card {
+            background-color: #1f4287;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .game-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.4);
+        }
+        .game-title {
+            color: #7b2cbf;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        .game-host {
+            color: #9d4edd;
+            font-style: italic;
+        }
+        .game-description {
+            margin: 15px 0;
+        }
+        .game-stats {
+            display: flex;
+            justify-content: space-between;
+            color: #9d4edd;
+            font-size: 0.9rem;
+        }
+        .btn-purple {
+            background-color: #7b2cbf;
+            border-color: #7b2cbf;
+            color: white;
+        }
+        .btn-purple:hover {
+            background-color: #9d4edd;
+            border-color: #9d4edd;
+            color: white;
+        }
+        .form-control {
+            background-color: #0f3460;
+            border: 1px solid #1f4287;
+            color: #ffffff;
+        }
+        .form-control:focus {
+            background-color: #0f3460;
+            border-color: #7b2cbf;
+            box-shadow: 0 0 0 0.25rem rgba(123, 44, 191, 0.25);
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="header d-flex justify-content-between align-items-center">
+            <span class="navbar-brand">Narrative Chaos</span>
+            <div>
+                <span class="welcome-message me-3">Welcome, {{ username }}</span>
+                <a href="{{ url_for('dashboard') }}" class="btn btn-outline-light btn-sm me-2">Dashboard</a>
+                <a href="{{ url_for('logout') }}" class="btn btn-outline-light btn-sm">Logout</a>
+            </div>
+        </div>
+        
+        <div class="container">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            
+            <div class="row mb-4">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header">Join a Narrative Game</div>
+                        <div class="card-body">
+                            <p>Enter a game code to join a private game, or browse available public games below.</p>
+                            
+                            <div class="row mb-4">
+                                <div class="col-md-6">
+                                    <form action="#" method="post">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" placeholder="Enter game code" aria-label="Game code">
+                                            <button class="btn btn-purple" type="submit">Join Private Game</button>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="col-md-6 text-md-end mt-3 mt-md-0">
+                                    <button class="btn btn-outline-secondary me-2">Refresh List</button>
+                                    <a href="{{ url_for('create_game') }}" class="btn btn-outline-purple" style="border-color: #7b2cbf; color: #7b2cbf;">Create New Game</a>
+                                </div>
+                            </div>
+                            
+                            <h4 class="mb-3">Public Games</h4>
+                            
+                            <!-- Example game cards -->
+                            <div class="game-card">
+                                <div class="game-title">The Forgotten Realms: Adventure Awaits</div>
+                                <div class="game-host">Hosted by: DungeonMaster42</div>
+                                <div class="game-description">
+                                    A fantasy adventure set in a world of magic and mystery. Join forces with other players to explore dungeons, battle mythical creatures, and uncover ancient treasures.
+                                </div>
+                                <div class="game-stats mb-3">
+                                    <span>Players: 3/6</span>
+                                    <span>Difficulty: Moderate</span>
+                                    <span>Started: 2 days ago</span>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="badge bg-success">Accepting Players</span>
+                                    <a href="{{ url_for('game_page', game_id='fantasy-123') }}" class="btn btn-purple">Join Game</a>
+                                </div>
+                            </div>
+                            
+                            <div class="game-card">
+                                <div class="game-title">Space Odyssey: The Final Frontier</div>
+                                <div class="game-host">Hosted by: CaptainKirk</div>
+                                <div class="game-description">
+                                    Set in the distant future, this sci-fi narrative puts you in command of a starship exploring uncharted territories. Face alien civilizations, navigate interstellar politics, and make decisions that will shape the fate of the galaxy.
+                                </div>
+                                <div class="game-stats mb-3">
+                                    <span>Players: 2/4</span>
+                                    <span>Difficulty: Hard</span>
+                                    <span>Started: Just now</span>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="badge bg-success">Accepting Players</span>
+                                    <a href="{{ url_for('game_page', game_id='scifi-456') }}" class="btn btn-purple">Join Game</a>
+                                </div>
+                            </div>
+                            
+                            <div class="game-card">
+                                <div class="game-title">Detective Chronicles: The Missing Heir</div>
+                                <div class="game-host">Hosted by: SherlockHolmes</div>
+                                <div class="game-description">
+                                    A murder mystery set in 1920s London. As private investigators, players must solve the case of a missing heir to a fortune. Interview suspects, find clues, and piece together the truth before it's too late.
+                                </div>
+                                <div class="game-stats mb-3">
+                                    <span>Players: 5/5</span>
+                                    <span>Difficulty: Moderate</span>
+                                    <span>Started: 1 week ago</span>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="badge bg-danger">Full</span>
+                                    <button class="btn btn-secondary" disabled>Game Full</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
